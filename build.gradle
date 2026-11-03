@@ -1,0 +1,14 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'com.velocityconnect'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.velocityconnect'
+        minSdk 23
+        targetSdk 32
+        versionCode 1
+        versionName '1.0'
+    }
+}

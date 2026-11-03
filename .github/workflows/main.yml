@@ -1,0 +1,74 @@
+
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Prepare Android project
+        run: |
+          mkdir -p app/src/main/java/com/velocityconnect
+          mv AndroidManifest.xml app/src/main/
+          mv MainActivity.java app/src/main/java/com/velocityconnect/
+
+          mkdir -p app
+          cat > app/build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application'
+          }
+
+          android {
+              namespace 'com.velocityconnect'
+              compileSdk 35
+
+              defaultConfig {
+                  applicationId 'com.velocityconnect'
+                  minSdk 23
+                  targetSdk 32
+                  versionCode 1
+                  versionName '1.0'
+              }
+          }
+          EOF
+
+          python3 - <<'PY'
+          p = 'app/src/main/java/com/velocityconnect/MainActivity.java'
+          s = open(p).read()
+          s = s.replace(
+              'runOnUiThread(() -> {\n                    statusView.setText("Bike found: " + name);',
+              'final String finalName = name;\n                runOnUiThread(() -> {\n                    statusView.setText("Bike found: " + finalName);'
+          )
+          open(p, 'w').write(s)
+          PY
+
+      - name: Build APK
+        run: gradle --no-daemon assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: VelocityConnect-APK
+          path: app/build/outputs/apk/debug/app-debug.apk

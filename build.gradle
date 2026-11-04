@@ -2,17 +2,3 @@
 plugins {
     id 'com.android.application' version '8.7.3' apply false
 }
-
-
-android {
-    namespace 'com.velocityconnect'
-    compileSdk 35
-
-    defaultConfig {
-        applicationId 'com.velocityconnect'
-        minSdk 23
-        targetSdk 32
-        versionCode 1
-        versionName '1.0'
-    }
-}

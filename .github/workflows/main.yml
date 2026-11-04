@@ -25,11 +25,11 @@ jobs:
         with:
           gradle-version: '8.9'
       
+      
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-
-      - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses
+        with:
+          packages: platform-tools
 
       - name: Prepare Android project
         run: |
